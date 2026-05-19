@@ -1,0 +1,48 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Restaurante {
+  restaurante_id        Int     @id @default(autoincrement())
+  restaurante_nome      String  @db.VarChar(100)
+  restaurante_categoria String? @db.VarChar(200)
+  restaurante_telefone  String? @db.VarChar(20)
+  restaurante_endereco  String? @db.VarChar(300)
+  restaurante_status    Int?
+
+  pratos Prato[]
+
+  @@map("restaurante")
+}
+
+model CategoriaPrato {
+  categoria_prato_id     Int     @id @default(autoincrement())
+  categoria_prato_nome   String  @db.VarChar(300)
+  categoria_prato_status Int?
+
+  pratos Prato[]
+
+  @@map("categoria_prato")
+}
+
+model Prato {
+  prato_id              Int      @id @default(autoincrement())
+  prato_nome            String   @db.VarChar(100)
+  prato_descricao       String?  @db.Text
+  prato_preco           Decimal  @db.Decimal(10, 2)
+  prato_disponibilidade Boolean?
+  prato_status          Int?
+
+  categoria_prato_id    Int
+  restaurante_id        Int
+
+  categoria   CategoriaPrato @relation(fields: [categoria_prato_id], references: [categoria_prato_id])
+  restaurante Restaurante    @relation(fields: [restaurante_id], references: [restaurante_id])
+
+  @@map("prato")
+}
