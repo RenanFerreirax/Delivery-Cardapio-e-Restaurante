@@ -1,0 +1,36 @@
+services:
+
+  rabbitmq:
+
+    image: rabbitmq:3-management
+
+    container_name: rabbitmq_delivery
+
+    restart: always
+
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  restaurante-cardapio:
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    container_name: restaurante-cardapio-api
+
+    restart: always
+
+    ports:
+      - "9521:9521"
+
+    environment:
+      PORT: 9521
+
+      DATABASE_URL: "mysql://20261_projint5_manha:senac%4012938@edumysql.acesso.rj.senac.br:3306/20261_projint5_manha_delivery_cardapio"
+
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672
+
+    depends_on:
+      - rabbitmq

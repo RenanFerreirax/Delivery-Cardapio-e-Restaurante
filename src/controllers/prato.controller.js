@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // src/controllers/prato.controller.js
 const prisma   = require("../config/prisma");
 const producer = require("../rabbitmq/producer");
@@ -111,10 +112,75 @@ module.exports = {
       console.error("[Prato] Erro ao remover:", error.message);
       return res.send(500, { error: "Erro ao remover prato." });
     }
+=======
+const prisma = require("../config/prisma");
+
+const {
+  publishPratoCriado,
+  publishPratoAtualizado,
+  publishPratoRemovido,
+} = require("../config/rabbitmq/producer");
+
+module.exports = {
+
+  async getPratos(req, res) {
+
+    try {
+
+      const pratos = await prisma.prato.findMany();
+
+      res.send(pratos);
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.send(500, {
+        error: "Erro ao buscar pratos",
+      });
+
+    }
+
+  },
+
+  async getPratoById(req, res) {
+
+    try {
+
+      const id = Number(req.params.id);
+
+      const prato = await prisma.prato.findUnique({
+        where: {
+          prato_id: id,
+        },
+      });
+
+      if (!prato) {
+
+        return res.send(404, {
+          error: "Prato não encontrado",
+        });
+
+      }
+
+      res.send(prato);
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.send(500, {
+        error: "Erro ao buscar prato",
+      });
+
+    }
+
+>>>>>>> bf57a41 (Atualização)
   },
 
   // GET /pratos/restaurante/:id
   async getPratosByRestaurante(req, res) {
+<<<<<<< HEAD
     try {
       const { id } = req.params;
       if (isNaN(Number(id))) return res.send(400, { error: "ID inválido." });
@@ -128,10 +194,36 @@ module.exports = {
       console.error("[Prato] Erro ao buscar por restaurante:", error.message);
       return res.send(500, { error: "Erro ao buscar pratos do restaurante." });
     }
+=======
+
+    try {
+
+      const id = Number(req.params.id);
+
+      const pratos = await prisma.prato.findMany({
+        where: {
+          restaurante_restaurante_id: id,
+        },
+      });
+
+      res.send(pratos);
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.send(500, {
+        error: "Erro ao buscar pratos do restaurante",
+      });
+
+    }
+
+>>>>>>> bf57a41 (Atualização)
   },
 
   // GET /pratos/categoria/:id
   async getPratosByCategoria(req, res) {
+<<<<<<< HEAD
     try {
       const { id } = req.params;
       if (isNaN(Number(id))) return res.send(400, { error: "ID inválido." });
@@ -146,4 +238,141 @@ module.exports = {
       return res.send(500, { error: "Erro ao buscar pratos da categoria." });
     }
   },
+=======
+
+    try {
+
+      const id = Number(req.params.id);
+
+      const pratos = await prisma.prato.findMany({
+        where: {
+          categoria_prato_id: id,
+        },
+      });
+
+      res.send(pratos);
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.send(500, {
+        error: "Erro ao buscar pratos da categoria",
+      });
+
+    }
+
+  },
+
+  async createPrato(req, res) {
+
+    try {
+
+      const prato = await prisma.prato.create({
+        data: req.body,
+      });
+
+      await publishPratoCriado(prato);
+
+      res.send(201, prato);
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.send(500, {
+        error: "Erro ao criar prato",
+      });
+
+    }
+
+  },
+
+  async updatePrato(req, res) {
+
+    try {
+
+      const id = Number(req.params.id);
+
+      const prato = await prisma.prato.update({
+        where: {
+          prato_id: id,
+        },
+        data: req.body,
+      });
+
+      await publishPratoAtualizado(prato);
+
+      res.send(prato);
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.send(500, {
+        error: "Erro ao atualizar prato",
+      });
+
+    }
+
+  },
+
+  async patchPrato(req, res) {
+
+    try {
+
+      const id = Number(req.params.id);
+
+      const prato = await prisma.prato.update({
+        where: {
+          prato_id: id,
+        },
+        data: req.body,
+      });
+
+      await publishPratoAtualizado(prato);
+
+      res.send(prato);
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.send(500, {
+        error: "Erro ao atualizar prato",
+      });
+
+    }
+
+  },
+
+  async deletePrato(req, res) {
+
+    try {
+
+      const id = Number(req.params.id);
+
+      await prisma.prato.delete({
+        where: {
+          prato_id: id,
+        },
+      });
+
+      await publishPratoRemovido(id);
+
+      res.send(204);
+
+    } catch (error) {
+
+      console.error(error);
+
+      res.send(500, {
+        error: "Erro ao remover prato",
+      });
+
+    }
+
+  },
+
+>>>>>>> bf57a41 (Atualização)
 };
