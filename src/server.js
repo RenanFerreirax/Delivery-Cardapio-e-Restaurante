@@ -1,29 +1,17 @@
-<<<<<<< HEAD
 // src/server.js
 require("dotenv").config();
 
 const restify = require("restify");
-const { connect, closeConnection } = require("./rabbitmq/connection");
-const { startAllConsumers }        = require("./rabbitmq/consumer");
-=======
-require("dotenv").config();
-
-const restify = require("restify");
-const { connect }          = require("./config/rabbitmq/connection");
-const { startAllConsumers } = require("./config/rabbitmq/consumer");
->>>>>>> bf57a41 (Atualização)
+const { connect }           = require("./rabbitmq/connection");
+const { startAllConsumers } = require("./rabbitmq/consumer");
 
 const RestauranteController    = require("./controllers/restaurante.controller");
 const PratoController          = require("./controllers/prato.controller");
 const CategoriaPratoController = require("./controllers/categoriaPrato.controller");
 
-<<<<<<< HEAD
-const server = restify.createServer({ name: "api-restaurante-cardapio" });
-=======
 const server = restify.createServer({
   name: "api-restaurante-cardapio",
 });
->>>>>>> bf57a41 (Atualização)
 
 // ── CORS ──────────────────────────────────────────────────────────────────────
 server.pre((req, res, next) => {
@@ -53,15 +41,6 @@ server.del("/restaurantes/:id",   RestauranteController.deleteRestaurante);
 
 // ── Pratos ────────────────────────────────────────────────────────────────────
 server.get("/pratos",                 PratoController.getPratos);
-<<<<<<< HEAD
-server.get("/pratos/:id",             PratoController.getPratoById);
-server.post("/pratos",                PratoController.createPrato);
-server.put("/pratos/:id",             PratoController.updatePrato);
-server.patch("/pratos/:id",           PratoController.patchPrato);
-server.del("/pratos/:id",             PratoController.deletePrato);
-server.get("/pratos/restaurante/:id", PratoController.getPratosByRestaurante);
-server.get("/pratos/categoria/:id",   PratoController.getPratosByCategoria);
-=======
 server.get("/pratos/restaurante/:id", PratoController.getPratosByRestaurante);
 server.get("/pratos/categoria/:id",   PratoController.getPratosByCategoria);
 server.get("/pratos/:id",             PratoController.getPratoById);
@@ -69,7 +48,6 @@ server.post("/pratos",                PratoController.createPrato);
 server.put("/pratos/:id",             PratoController.updatePrato);
 server.patch("/pratos/:id",           PratoController.patchPrato);
 server.del("/pratos/:id",             PratoController.deletePrato);
->>>>>>> bf57a41 (Atualização)
 
 // ── Categorias ────────────────────────────────────────────────────────────────
 server.get("/categorias",       CategoriaPratoController.getCategorias);
@@ -83,13 +61,9 @@ server.del("/categorias/:id",   CategoriaPratoController.deleteCategoria);
 const PORT = process.env.PORT || 9521;
 
 async function bootstrap() {
-<<<<<<< HEAD
-  // RabbitMQ em background — API sobe mesmo sem ele disponível
-=======
   console.log("🚀 Iniciando aplicação...");
 
   // RabbitMQ em background — API sobe mesmo sem ele
->>>>>>> bf57a41 (Atualização)
   connect()
     .then(() => startAllConsumers())
     .catch((err) => {
@@ -98,25 +72,6 @@ async function bootstrap() {
 
   // API sobe independente do RabbitMQ
   server.listen(PORT, () => {
-<<<<<<< HEAD
-    console.log(`\n✅ ${server.name} rodando em ${server.url}`);
-    console.log(`🐇 RabbitMQ: ${process.env.RABBITMQ_URL || "amqp://localhost:5672"}`);
-    console.log(`🗄️  Banco:    ${process.env.DATABASE_URL}\n`);
-  });
-}
-
-process.on("SIGINT",  shutdown);
-process.on("SIGTERM", shutdown);
-
-async function shutdown() {
-  console.log("\n🛑 Encerrando servidor...");
-  server.close(async () => {
-    await closeConnection();
-    console.log("👋 Servidor encerrado.");
-    process.exit(0);
-  });
-}
-=======
     console.log(`✅ API rodando na porta ${PORT}`);
     console.log(`🐇 RabbitMQ: ${process.env.RABBITMQ_URL || "amqp://localhost:5672"}`);
     console.log(`🗄️  Banco:    ${process.env.DATABASE_URL}`);
@@ -125,6 +80,5 @@ async function shutdown() {
 
 process.on("SIGINT",  () => { server.close(() => process.exit(0)); });
 process.on("SIGTERM", () => { server.close(() => process.exit(0)); });
->>>>>>> bf57a41 (Atualização)
 
 bootstrap();

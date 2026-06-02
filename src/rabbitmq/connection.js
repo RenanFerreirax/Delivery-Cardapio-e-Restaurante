@@ -7,13 +7,13 @@ const RECONNECT_DELAY_MS = 5000;
 let connection = null;
 let channel    = null;
 
-const EXCHANGE_NAME = "delivery_platform";
+const EXCHANGE_NAME = "delivery.restaurante-cardapio";
 const EXCHANGE_TYPE = "topic";
 
 const QUEUES = {
-  RESTAURANTES: "restaurantes_queue",
-  PRATOS:       "pratos_queue",
-  DEAD_LETTER:  "dead_letter_queue",
+  RESTAURANTES: "delivery.restaurante-cardapio.restaurantes",
+  PRATOS:       "delivery.restaurante-cardapio.pratos",
+  DEAD_LETTER:  "delivery.restaurante-cardapio.dead-letter",
 };
 
 const ROUTING_KEYS = {

@@ -11,11 +11,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-<<<<<<< HEAD
-    "@prisma/client": "^5.22.0",
-=======
     "@prisma/client": "^6.19.3",
->>>>>>> bf57a41 (Atualização)
     "amqplib": "^2.0.1",
     "dotenv": "^17.4.2",
     "node-fetch": "^3.3.2",
