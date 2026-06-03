@@ -2,8 +2,8 @@
     agent any
 
     environment {
-        IMAGE_NAME = "Delivery-restaurante-cardapio"
-        IMAGE_TAG  = "Delivery-restaurante-cardapio"
+        IMAGE_NAME = "delivery-restaurante-cardapio"
+        IMAGE_TAG  = "delivery-restaurante-cardapio"
     }
 
     stages {
