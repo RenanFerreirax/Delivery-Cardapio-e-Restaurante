@@ -17,12 +17,12 @@ const QUEUES = {
 };
 
 const ROUTING_KEYS = {
-  RESTAURANTE_CRIADO:     "restaurante.criado",
-  RESTAURANTE_ATUALIZADO: "restaurante.atualizado",
-  RESTAURANTE_REMOVIDO:   "restaurante.removido",
-  PRATO_CRIADO:           "prato.criado",
-  PRATO_ATUALIZADO:       "prato.atualizado",
-  PRATO_REMOVIDO:         "prato.removido",
+  RESTAURANTE_CRIADO:     "delivery.restaurante.criado",
+  RESTAURANTE_ATUALIZADO: "delivery.restaurante.atualizado",
+  RESTAURANTE_REMOVIDO:   "delivery.restaurante.removido",
+  PRATO_CRIADO:           "delivery.prato.criado",
+  PRATO_ATUALIZADO:       "delivery.prato.atualizado",
+  PRATO_REMOVIDO:         "delivery.prato.removido",
 };
 
 async function connect() {
@@ -35,22 +35,22 @@ async function connect() {
     await channel.prefetch(1);
 
     await channel.assertExchange(EXCHANGE_NAME, EXCHANGE_TYPE, { durable: true });
-    await channel.assertExchange("dead_letter_exchange", "direct", { durable: true });
+    await channel.assertExchange("delivery.dead-letter-exchange", "direct", { durable: true });
 
     await channel.assertQueue(QUEUES.RESTAURANTES, {
       durable: true,
-      arguments: { "x-dead-letter-exchange": "dead_letter_exchange" },
+      arguments: { "x-dead-letter-exchange": "delivery.dead-letter-exchange" },
     });
-    await channel.bindQueue(QUEUES.RESTAURANTES, EXCHANGE_NAME, "restaurante.#");
+    await channel.bindQueue(QUEUES.RESTAURANTES, EXCHANGE_NAME, "delivery.restaurante.#");
 
     await channel.assertQueue(QUEUES.PRATOS, {
       durable: true,
-      arguments: { "x-dead-letter-exchange": "dead_letter_exchange" },
+      arguments: { "x-dead-letter-exchange": "delivery.dead-letter-exchange" },
     });
-    await channel.bindQueue(QUEUES.PRATOS, EXCHANGE_NAME, "prato.#");
+    await channel.bindQueue(QUEUES.PRATOS, EXCHANGE_NAME, "delivery.prato.#");
 
     await channel.assertQueue(QUEUES.DEAD_LETTER, { durable: true });
-    await channel.bindQueue(QUEUES.DEAD_LETTER, "dead_letter_exchange", "");
+    await channel.bindQueue(QUEUES.DEAD_LETTER, "delivery.dead-letter-exchange", "");
 
     connection.on("error", (err) => {
       console.error("[RabbitMQ] ❌ Erro na conexão:", err.message);

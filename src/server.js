@@ -63,20 +63,27 @@ const PORT = process.env.PORT || 9521;
 async function bootstrap() {
   console.log("🚀 Iniciando aplicação...");
 
-  // RabbitMQ em background — API sobe mesmo sem ele
   connect()
     .then(() => startAllConsumers())
     .catch((err) => {
       console.warn("[RabbitMQ] ⚠️  Rodando sem RabbitMQ:", err.message);
     });
 
-  // API sobe independente do RabbitMQ
   server.listen(PORT, () => {
     console.log(`✅ API rodando na porta ${PORT}`);
     console.log(`🐇 RabbitMQ: ${process.env.RABBITMQ_URL || "amqp://localhost:5672"}`);
     console.log(`🗄️  Banco:    ${process.env.DATABASE_URL}`);
   });
 }
+
+// ── Captura erros não tratados ────────────────────────────────────────────────
+process.on("uncaughtException", (error) => {
+  console.error("❌ Erro não tratado:", error.message);
+});
+
+process.on("unhandledRejection", (reason) => {
+  console.error("❌ Promise rejeitada:", reason);
+});
 
 process.on("SIGINT",  () => { server.close(() => process.exit(0)); });
 process.on("SIGTERM", () => { server.close(() => process.exit(0)); });
