@@ -29,7 +29,7 @@
             }
         }
 
-        stage('Build Docker') {
+        stage('Build docker') {
             steps {
                 echo '🐳 Fazendo build da imagem Docker...'
                 sh "docker build -t ${IMAGE_NAME}:${IMAGE_TAG} ."
