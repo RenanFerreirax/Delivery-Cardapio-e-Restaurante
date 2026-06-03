@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
 
-    container_name: restaurante-cardapio-api
+    container_name: Delivery-restaurante-cardapio
 
     restart: always
 
