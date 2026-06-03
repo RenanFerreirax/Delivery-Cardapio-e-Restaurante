@@ -36,12 +36,12 @@
             }
         }
 
-        stage('Deploy') {
-            steps {
-                echo '🚀 Subindo containers com Docker Compose...'
-                sh 'docker-compose up -d --build'
-            }
-        }
+       stage('Deploy') {
+    steps {
+        echo '🚀 Subindo containers com Docker Compose...'
+        sh 'docker compose up -d --build'
+    }
+}
 
     }
 
