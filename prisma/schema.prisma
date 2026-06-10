@@ -14,8 +14,7 @@ model Restaurante {
   restaurante_telefone  String? @db.VarChar(20)
   restaurante_endereco  String? @db.VarChar(300)
   restaurante_status    Int?
-
-  pratos Prato[]
+  pratos                Prato[]
 
   @@map("restaurante")
 }
@@ -24,25 +23,24 @@ model CategoriaPrato {
   categoria_prato_id     Int     @id @default(autoincrement())
   categoria_prato_nome   String  @db.VarChar(300)
   categoria_prato_status Int?
-
-  pratos Prato[]
+  pratos                 Prato[]
 
   @@map("categoria_prato")
 }
 
 model Prato {
-  prato_id              Int      @id @default(autoincrement())
-  prato_nome            String   @db.VarChar(100)
-  prato_descricao       String?  @db.Text
-  prato_preco           Decimal  @db.Decimal(10, 2)
-  prato_disponibilidade Boolean?
+  prato_id              Int            @id @default(autoincrement())
+  prato_nome            String         @db.VarChar(100)
+  prato_descricao       String?        @db.Text
+  prato_preco           Decimal        @db.Decimal(10, 2)
+  prato_disponibilidade Int?           @db.TinyInt
   prato_status          Int?
-
   categoria_prato_id    Int
   restaurante_id        Int
+  categoria             CategoriaPrato @relation(fields: [categoria_prato_id], references: [categoria_prato_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_prato_categoria_prato1")
+  restaurante           Restaurante    @relation(fields: [restaurante_id], references: [restaurante_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_prato_restaurante1")
 
-  categoria   CategoriaPrato @relation(fields: [categoria_prato_id], references: [categoria_prato_id])
-  restaurante Restaurante    @relation(fields: [restaurante_id], references: [restaurante_id])
-
+  @@index([categoria_prato_id], map: "fk_prato_categoria_prato1_idx")
+  @@index([restaurante_id], map: "fk_prato_restaurante1_idx")
   @@map("prato")
 }
