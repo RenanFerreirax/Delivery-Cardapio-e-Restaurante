@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 
-ENV DATABASE_URL="mysql://20261_projint5_manha:senac@12938@edumysql.acesso.rj.senac.br:3306/20261_projint5_manha_delivery_cardapio"
+ENV DATABASE_URL="mmysql://20261_projint5_manha:senac@12938@edumysql.acesso.rj.senac.br:3306/20261_projint5_manha_delivery_cardapio"
 
 RUN npx prisma generate
 
@@ -20,7 +20,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/src ./src
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/package.json ./package.json
-COPY --from=builder /app/.prisma ./.prisma
+
 
 ENV NODE_ENV=production
 ENV PORT=9521
