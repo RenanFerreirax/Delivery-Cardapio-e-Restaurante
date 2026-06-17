@@ -71,7 +71,7 @@ async function bootstrap() {
 
   server.listen(PORT, () => {
     console.log(`✅ API rodando na porta ${PORT}`);
-    console.log(`🐇 RabbitMQ: ${process.env.RABBITMQ_URL || "amqp://localhost:5672"}`);
+    console.log(`🐇 RabbitMQ: ${process.env.RABBITMQ_URL || "amqp://admin:admin@10.136.38.50:5672"}`);
     console.log(`🗄️  Banco:    ${process.env.DATABASE_URL}`);
   });
 }

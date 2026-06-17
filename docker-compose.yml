@@ -16,7 +16,7 @@ services:
     environment:
       PORT: 9521
 
-      DATABASE_URL: "mysql://20261_projint5_manha:senac%4012938@edumysql.acesso.rj.senac.br:3306/20261_projint5_manha_delivery_cardapio"
+      DATABASE_URL: "mysql://20261_projint5_manha:senac@12938@edumysql.acesso.rj.senac.br:3306/20261_projint5_manha_delivery_cardapio"
 
       RABBITMQ_URL: "amqp://admin:admin@10.136.38.50:5672"
 
