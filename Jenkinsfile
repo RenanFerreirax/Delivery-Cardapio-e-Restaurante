@@ -15,81 +15,136 @@ pipeline {
     }
 
     stages {
-        stage('Stop and Remove Old Container') {
+        stage('Clean Up') {
             steps {
                 script {
-                    echo 'Limpando containers e imagens antigas...'
-                    sh "docker stop ${CONTAINER_NAME} || true"
-                    sh "docker rm ${CONTAINER_NAME} || true"
+                    echo '🧹 Limpando containers e imagens antigas...'
+                    sh '''#!/bin/bash
+                        set +e
+                        docker stop ${CONTAINER_NAME} 2>/dev/null
+                        docker rm ${CONTAINER_NAME} 2>/dev/null
+                        docker rmi ${IMAGE_NAME}:latest 2>/dev/null
+                        set -e
+                    '''
                 }
             }
         }
 
-        stage('Install and Prisma Generate') {
+        stage('Install Dependencies') {
             steps {
-                echo 'Preparando dependências e gerando cliente do Prisma usando Infisical...'
-
-                sh '''
+                echo '📦 Instalando dependências...'
+                sh '''#!/bin/bash
                     npm install
-
-                    # Instala o Infisical CLI localmente no projeto, sem precisar de sudo/root
                     npm install --no-save @infisical/cli
+                '''
+            }
+        }
 
+        stage('Generate Prisma Client with Infisical') {
+            steps {
+                echo '🔐 Gerando cliente Prisma com variáveis do Infisical...'
+                sh '''#!/bin/bash
                     set +x
+                    
+                    # Fazer login no Infisical
                     export INFISICAL_TOKEN=$(./node_modules/.bin/infisical login \
                         --method=universal-auth \
                         --client-id="$INFISICAL_CLIENT_ID" \
                         --client-secret="$INFISICAL_CLIENT_SECRET" \
                         --silent \
                         --plain)
-
+                    
+                    if [ -z "$INFISICAL_TOKEN" ]; then
+                        echo "❌ Falha ao fazer login no Infisical"
+                        exit 1
+                    fi
+                    
+                    # Gerar Prisma Client
                     ./node_modules/.bin/infisical run \
                         --projectId="$INFISICAL_PROJECT_ID" \
                         --env="$INFISICAL_ENV" \
                         -- npx prisma generate
+                    
                     set -x
+                    echo "✅ Prisma Client gerado com sucesso"
                 '''
             }
         }
 
         stage('Docker Build') {
             steps {
-                echo 'Construindo a nova imagem Docker...'
+                echo '🐳 Construindo imagem Docker..'
                 sh "docker build -t ${IMAGE_NAME}:latest ."
             }
         }
 
-        stage('Docker Run') {
+        stage('Docker Run with Infisical Env') {
             steps {
-                echo 'Subindo o microserviço com injeção de variáveis...'
-
-                sh '''
-                    # Garante que a CLI local do Infisical existe
-                    if [ ! -f ./node_modules/.bin/infisical ]; then
-                        npm install --no-save @infisical/cli
-                    fi
-
+                echo '🚀 Iniciando container com variáveis do Infisical...'
+                sh '''#!/bin/bash
                     set +x
+                    
+                    # Fazer login no Infisical
                     export INFISICAL_TOKEN=$(./node_modules/.bin/infisical login \
                         --method=universal-auth \
                         --client-id="$INFISICAL_CLIENT_ID" \
                         --client-secret="$INFISICAL_CLIENT_SECRET" \
                         --silent \
                         --plain)
-
+                    
+                    if [ -z "$INFISICAL_TOKEN" ]; then
+                        echo "❌ Falha ao fazer login no Infisical"
+                        exit 1
+                    fi
+                    
+                    # Exportar variáveis do Infisical para arquivo .env
                     ./node_modules/.bin/infisical export \
                         --projectId="$INFISICAL_PROJECT_ID" \
                         --env="$INFISICAL_ENV" \
-                        --format=dotenv > .env
+                        --format=dotenv > /tmp/.env
+                    
                     set -x
-
+                    
+                    # Iniciar container com as variáveis
                     docker run -d \
                         --name ${CONTAINER_NAME} \
-                        --env-file .env \
+                        --env-file /tmp/.env \
                         -p ${APP_PORT}:${APP_PORT} \
                         ${IMAGE_NAME}:latest
+                    
+                    # Aguardar container ficar pronto
+                    sleep 5
+                    
+                    # Verificar se container está rodando
+                    if docker ps | grep -q ${CONTAINER_NAME}; then
+                        echo "✅ Container iniciado com sucesso"
+                        docker logs ${CONTAINER_NAME} | head -20
+                    else
+                        echo "❌ Falha ao iniciar container"
+                        docker logs ${CONTAINER_NAME}
+                        exit 1
+                    fi
+                    
+                    # Limpar arquivo temporário
+                    rm -f /tmp/.env
+                '''
+            }
+        }
 
-                    rm -f .env
+        stage('Health Check') {
+            steps {
+                echo '🏥 Verificando saúde da aplicação...'
+                sh '''#!/bin/bash
+                    for i in {1..10}; do
+                        echo "Tentativa $i/10"
+                        if curl -f http://localhost:${APP_PORT}/restaurantes >/dev/null 2>&1; then
+                            echo "✅ Aplicação respondendo corretamente"
+                            exit 0
+                        fi
+                        sleep 2
+                    done
+                    echo "❌ Aplicação não respondeu após 20 segundos"
+                    exit 1
                 '''
             }
         }
@@ -97,11 +152,21 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline executado com sucesso! O serviço está rodando.'
+            echo '✅ Pipeline executado com sucesso! O serviço está rodando.'
         }
         failure {
-            echo 'Erro no pipeline. Verifique os logs do Docker ou do Prisma.'
-            sh "docker logs ${CONTAINER_NAME} || true"
+            echo '❌ Erro no pipeline.'
+            sh '''#!/bin/bash
+                echo "--- Logs do Container ---"
+                docker logs ${CONTAINER_NAME} 2>/dev/null || echo "Container não encontrado"
+                echo "--- Containers Rodando ---"
+                docker ps
+                echo "--- Imagens Disponíveis ---"
+                docker images | grep ${IMAGE_NAME}
+            '''
+        }
+        always {
+            sh 'rm -f /tmp/.env'
         }
     }
 }
