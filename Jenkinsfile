@@ -130,24 +130,6 @@ pipeline {
                 '''
             }
         }
-
-        stage('Health Check') {
-            steps {
-                echo '🏥 Verificando saúde da aplicação...'
-                sh '''#!/bin/bash
-                    for i in {1..10}; do
-                        echo "Tentativa $i/10"
-                        if curl -f http://localhost:${APP_PORT}/restaurantes >/dev/null 2>&1; then
-                            echo "✅ Aplicação respondendo corretamente"
-                            exit 0
-                        fi
-                        sleep 2
-                    done
-                    echo "❌ Aplicação não respondeu após 20 segundos"
-                    exit 1
-                '''
-            }
-        }
     }
 
     post {

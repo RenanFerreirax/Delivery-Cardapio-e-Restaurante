@@ -8,7 +8,7 @@ RUN npm install
 
 COPY . .
 
-ENV DATABASE_URL="mmysql://20261_projint5_manha:senac@12938@edumysql.acesso.rj.senac.br:3306/20261_projint5_manha_delivery_cardapio"
+ENV DATABASE_URL="mysql://20261_projint5_manha:senac@12938@edumysql.acesso.rj.senac.br:3306/20261_projint5_manha_delivery_cardapio"
 
 RUN npx prisma generate
 
