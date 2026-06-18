@@ -1,35 +1,28 @@
+version: "3.9"
 services:
-
   restaurante-cardapio:
-
     build:
       context: .
       dockerfile: Dockerfile
-
     container_name: delivery-restaurante-cardapio
-
-    restart: always
-
+    restart: unless-stopped
     ports:
-      - "9521:9521"
-
+      - "9521:9521" # Porta pública do microsserviço de Restaurante/Cardápio
     environment:
       PORT: 9521
-
-      DATABASE_URL: "mysql://20261_projint5_manha:senac@12938@edumysql.acesso.rj.senac.br:3306/20261_projint5_manha_delivery_cardapio"
-
-      RABBITMQ_URL: "amqp://admin:admin@10.136.38.50:5672"
-
       NODE_ENV: production
       # # Banco de dados (Configure no .env do servidor)
       # DATABASE_URL: ${DATABASE_URL}
       # # RabbitMQ (servidor externo da faculdade)
       # RABBITMQ_URL: ${RABBITMQ_URL}
       RABBITMQ_RECONNECT_DELAY: 5000
-      INFISICAL_CLIENT_ID: "3183000a-2235-4e3a-84e8-ba3a76199375"
-      INFISICAL_CLIENT_SECRET: "f1611fd23ab5c4b1c0ed53c4ba723a379592b36a1bdd3e5e12ef7062d6525d17"
+      INFISICAL_CLIENT_ID: "cc269db8-d1a7-4190-ba5b-2e2c1fdc1448"
+      INFISICAL_CLIENT_SECRET: "2e7571a0e53c9c52540ca96cac17036ea1f319effa4bd014aba93241cc54aaea"
       INFISICAL_PROJECT_ID: "75293cd1-53c5-4a7c-860e-c515f97de341"
       INFISICAL_ENV: "prod"
-      INFISICAL_SECRET_PATH: "/pasta"
-
-
+      INFISICAL_SECRET_PATH: "/"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
