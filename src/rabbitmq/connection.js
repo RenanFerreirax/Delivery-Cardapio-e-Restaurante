@@ -5,24 +5,24 @@ const RABBITMQ_URL = process.env.RABBITMQ_URL || "amqp://admin:admin@10.136.38.5
 const RECONNECT_DELAY_MS = 5000;
 
 let connection = null;
-let channel    = null;
+let channel = null;
 
 const EXCHANGE_NAME = "delivery.restaurante-cardapio";
 const EXCHANGE_TYPE = "topic";
 
 const QUEUES = {
   RESTAURANTES: "delivery.restaurante-cardapio.restaurantes",
-  PRATOS:       "delivery.restaurante-cardapio.pratos",
-  DEAD_LETTER:  "delivery.restaurante-cardapio.dead-letter",
+  PRATOS: "delivery.restaurante-cardapio.pratos",
+  DEAD_LETTER: "delivery.restaurante-cardapio.dead-letter",
 };
 
 const ROUTING_KEYS = {
-  RESTAURANTE_CRIADO:     "delivery.restaurante.criado",
+  RESTAURANTE_CRIADO: "delivery.restaurante.criado",
   RESTAURANTE_ATUALIZADO: "delivery.restaurante.atualizado",
-  RESTAURANTE_REMOVIDO:   "delivery.restaurante.removido",
-  PRATO_CRIADO:           "delivery.prato.criado",
-  PRATO_ATUALIZADO:       "delivery.prato.atualizado",
-  PRATO_REMOVIDO:         "delivery.prato.removido",
+  RESTAURANTE_REMOVIDO: "delivery.restaurante.removido",
+  PRATO_CRIADO: "delivery.prato.criado",
+  PRATO_ATUALIZADO: "delivery.prato.atualizado",
+  PRATO_REMOVIDO: "delivery.prato.removido",
 };
 
 async function connect() {
@@ -30,7 +30,7 @@ async function connect() {
     console.log("[RabbitMQ] 🔌 Conectando em:", RABBITMQ_URL);
 
     connection = await amqp.connect(RABBITMQ_URL);
-    channel    = await connection.createChannel();
+    channel = await connection.createChannel();
 
     await channel.prefetch(1);
 
@@ -59,7 +59,7 @@ async function connect() {
     connection.on("close", () => {
       console.warn("[RabbitMQ] ⚠️  Conexão encerrada. Reconectando em", RECONNECT_DELAY_MS / 1000, "s...");
       connection = null;
-      channel    = null;
+      channel = null;
       setTimeout(connect, RECONNECT_DELAY_MS);
     });
 
@@ -83,7 +83,7 @@ function getChannel() {
 
 async function closeConnection() {
   try {
-    if (channel)    await channel.close();
+    if (channel) await channel.close();
     if (connection) await connection.close();
     console.log("[RabbitMQ] 🔒 Conexão encerrada.");
   } catch (error) {
