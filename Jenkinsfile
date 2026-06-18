@@ -6,12 +6,6 @@ pipeline {
         CONTAINER_NAME = "delivery-restaurante-cardapio"
         APP_PORT = "9521"
 
-        // Infisical
-        INFISICAL_CLIENT_ID = "3183000a-2235-4e3a-84e8-ba3a76199375"
-        INFISICAL_CLIENT_SECRET = "f1611fd23ab5c4b1c0ed53c4ba723a379592b36a1bdd3e5e12ef7062d6525d17"
-        INFISICAL_PROJECT_ID = "75293cd1-53c5-4a7c-860e-c515f97de341"
-        INFISICAL_ENV = "prod"
-        INFISICAL_SECRET_PATH = "/pasta"
     }
 
     stages {
