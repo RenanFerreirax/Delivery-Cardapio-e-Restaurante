@@ -1,40 +1,30 @@
 pipeline {
     agent any
-    environment {
-        DOCKER_BUILDKIT = '1'
-    }
+
     stages {
-        stage('Verificar Repositório') {
+
+        stage('Fetch Secrets') {
             steps {
-                checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: '*/main']],
-                    doGenerateSubmoduleConfigurations: false,
-                    extensions: [],
-                    submoduleCfg: [],
-                    userRemoteConfigs: [[
-                        url: 'https://github.com/RenanFerreirax/Delivery-Cardapio-e-Restaurante.git'
-                    ]]
-                ])
+                sh 'npx -y @infisical/cli export --env="prod" --path="/" --token="st.st.df83fe53-4aa8-459c-a902-e318c8be7cef.a730694c013a57640ea2417f82693f24.8be2b43fe241881935e18aa1fbbe9f40" > .env'
             }
         }
+
         stage('Instalar Dependências') {
             steps {
                 sh '''
                     rm -rf node_modules
-                    rm -rf package-lock.json
                     npm install
                     npx prisma generate
                 '''
             }
         }
+
         stage('Build Docker') {
             steps {
-                sh '''
-                    docker compose build --no-cache
-                '''
+                sh 'docker compose build --no-cache'
             }
         }
+
         stage('Deploy') {
             steps {
                 sh '''
@@ -43,15 +33,17 @@ pipeline {
                 '''
             }
         }
+
         stage('Verificar Containers') {
             steps {
                 sh 'docker ps'
             }
         }
     }
+
     post {
         success {
-            echo 'Deploy do Restaurante/Cardápio realizado com sucesso no Yacht (Linux)!'
+            echo 'Deploy do Restaurante/Cardápio realizado com sucesso!'
         }
         failure {
             echo 'Houve um erro durante o deploy do Restaurante/Cardápio.'

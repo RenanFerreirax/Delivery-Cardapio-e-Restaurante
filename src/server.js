@@ -69,14 +69,13 @@ async function bootstrap() {
       console.warn("[RabbitMQ] ⚠️  Rodando sem RabbitMQ:", err.message);
     });
 
-  server.listen(PORT, () => {
+  server.listen(PORT, "0.0.0.0", () => {
     console.log(`✅ API rodando na porta ${PORT}`);
-    console.log(`🐇 RabbitMQ: ${process.env.RABBITMQ_URL || "amqp://admin:admin@10.136.38.50:5672"}`);
+    console.log(`🐇 RabbitMQ: ${process.env.RABBITMQ_URL}`);
     console.log(`🗄️  Banco:    ${process.env.DATABASE_URL}`);
   });
 }
 
-// ── Captura erros não tratados ────────────────────────────────────────────────
 process.on("uncaughtException", (error) => {
   console.error("❌ Erro não tratado:", error.message);
 });
