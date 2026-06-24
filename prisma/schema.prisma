@@ -11,6 +11,7 @@ model Restaurante {
   restaurante_id        Int     @id @default(autoincrement())
   restaurante_nome      String  @db.VarChar(100)
   restaurante_categoria String? @db.VarChar(200)
+  restaurante_descricao String? @db.VarChar(300)
   restaurante_telefone  String? @db.VarChar(20)
   restaurante_endereco  String? @db.VarChar(300)
   restaurante_status    Int?
